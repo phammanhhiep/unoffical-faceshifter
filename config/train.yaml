@@ -1,10 +1,10 @@
 log:
-  log_dir: 'log'
-  chkpt_dir: 'chkpt'
+  log_dir: 'artifacts/log'
+  chkpt_dir: 'artifacts/checkpoint'
 
 
 arcface:
-  chkpt_path: 'Arcface.pth'
+  chkpt_path: 'artifacts/experiments/arcface/Arcface.pth'
   vector_size: 256
 
 data:
@@ -18,7 +18,7 @@ model:
   beta1: 0
   beta2: 0.999
 
-  batch_size: 16
+  batch_size: 2
 
-  num_workers: 16
+  num_workers: 0
   grad_clip: 0.0
