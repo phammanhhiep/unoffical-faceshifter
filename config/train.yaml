@@ -1,15 +1,15 @@
 log:
   log_dir: 'artifacts/log'
-  chkpt_dir: 'artifacts/checkpoint'
+  chkpt_dir: 'artifacts/checkpoints'
 
 
 arcface:
-  chkpt_path: 'artifacts/experiments/arcface/Arcface.pth'
+  chkpt_path: 'artifacts/experiments/idt_encoder/ArcFace.pth'
   vector_size: 256
 
 data:
-  dataset_dir: ''
-  valset_dir: ''
+  dataset_dir: 'artifacts/datasets/ffhq_sample'
+  valset_dir: 'artifacts/datasets/ffhq_sample'
 
 model:
   learning_rate_E_G: 4e-4
@@ -20,5 +20,5 @@ model:
 
   batch_size: 2
 
-  num_workers: 0
+  num_workers: 1
   grad_clip: 0.0
