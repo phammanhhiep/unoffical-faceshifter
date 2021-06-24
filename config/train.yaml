@@ -1,24 +1,46 @@
 log:
-  log_dir: 'artifacts/log'
-  chkpt_dir: 'artifacts/checkpoints'
+  root_dir: "artifacts/log"
+  version: null
+  to_file: false
+  log_every_n_steps: 10 # potentially slow the training if using a small value
 
+chkpt:
+  root_dir: "artifacts/checkpoints"
+  monitor: "val_loss" # metric to determine if to save
+  save_top_k: 1 # only top k models to be save
+  every_n_val_epochs: null # save after n (training) epochs. It works if save_top_k > 0
+  every_n_train_steps: null # mutually exclusive to every_n_val_epochs
+  save_last: true # only work after the first validation step
 
 arcface:
-  chkpt_path: 'artifacts/experiments/idt_encoder/ArcFace.pth'
+  pth: "artifacts/experiments/idt_encoder/ArcFace.pth"
   vector_size: 256
 
 data:
-  dataset_dir: 'artifacts/datasets/ffhq_sample'
-  valset_dir: 'artifacts/datasets/ffhq_sample'
+  trainset_dir: "artifacts/datasets/ffhq/train"
+  valset_dir: "artifacts/datasets/ffhq/val"
+
+trainer:
+  batch_size: 32
+  num_workers: 2
+  max_epoch: 1000
+  num_processes: 1 # for distributed computation
+  
+  val_check_interval: 100
+
+  limit_train_batches: 0.1 # restrict a mount of data for training
+  limit_val_batches: 0.1 # restrict a mount of data for validation
 
 model:
+  name: "faceshifter"
+  experiment: "test_pytorch_lightning" # to create log and checkpoint dir
+
   learning_rate_E_G: 4e-4
   learning_rate_D: 4e-4
 
   beta1: 0
   beta2: 0.999
 
-  batch_size: 2
-
-  num_workers: 1
   grad_clip: 0.0
+
+  

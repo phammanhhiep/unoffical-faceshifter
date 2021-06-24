@@ -16,6 +16,7 @@ from model.loss import GANLoss, AEI_Loss
 
 from dataset import *
 
+
 class AEINet(pl.LightningModule):
     def __init__(self, hp):
         super(AEINet, self).__init__()
@@ -26,7 +27,7 @@ class AEINet(pl.LightningModule):
         self.D = MultiscaleDiscriminator(3)
 
         self.Z = resnet101(num_classes=256)
-        self.Z.load_state_dict(torch.load(hp.arcface.chkpt_path, map_location='cpu'))
+        self.Z.load_state_dict(torch.load(hp.arcface.pth, map_location='cpu'))
 
         self.Loss_GAN = GANLoss()
         self.Loss_E_G = AEI_Loss()
@@ -57,16 +58,16 @@ class AEINet(pl.LightningModule):
 
             output_multi_scale_val = self.D(output)
             loss_GAN = self.Loss_GAN(output_multi_scale_val, True, for_discriminator=False)
-            loss_E_G, loss_att, loss_id, loss_rec = self.Loss_E_G(target_img, output, feature_map, output_feature_map, z_id,
-                                                             output_z_id, same)
+            loss_E_G, loss_attr, loss_id, loss_rec = self.Loss_E_G(target_img, 
+                output, feature_map, output_feature_map, z_id, output_z_id, same)
 
             loss_G = loss_E_G + loss_GAN
 
-            self.logger.experiment.add_scalar("Loss G", loss_G.item(), self.global_step)
-            self.logger.experiment.add_scalar("Attribute Loss", loss_att.item(), self.global_step)
-            self.logger.experiment.add_scalar("ID Loss", loss_id.item(), self.global_step)
-            self.logger.experiment.add_scalar("Reconstruction Loss", loss_rec.item(), self.global_step)
-            self.logger.experiment.add_scalar("GAN Loss", loss_GAN.item(), self.global_step)
+            self.log("gan_loss", loss_GAN.item(),prog_bar=True)
+            self.log("g_loss", loss_G.item(),prog_bar=True)
+            self.log("attr_loss", loss_attr.item(),prog_bar=True)
+            self.log("id_loss", loss_id.item(), prog_bar=True)
+            self.log("rec_loss", loss_rec.item(),prog_bar=True)
 
             return loss_G
 
@@ -79,7 +80,7 @@ class AEINet(pl.LightningModule):
 
             loss_D = loss_D_fake + loss_D_real
 
-            self.logger.experiment.add_scalar("Loss D", loss_D.item(), self.global_step)
+            self.log("d_loss", loss_D.item(), prog_bar=True)
             return loss_D
 
     def validation_step(self, batch, batch_idx):
@@ -91,23 +92,34 @@ class AEINet(pl.LightningModule):
 
         output_multi_scale_val = self.D(output)
         loss_GAN = self.Loss_GAN(output_multi_scale_val, True, for_discriminator=False)
-        loss_E_G, loss_att, loss_id, loss_rec = self.Loss_E_G(target_img, output, feature_map, output_feature_map,
-                                                              z_id, output_z_id, same)
+        loss_E_G, loss_attr, loss_id, loss_rec = self.Loss_E_G(target_img, output, 
+            feature_map, output_feature_map, z_id, output_z_id, same)
         loss_G = loss_E_G + loss_GAN
-        return {"loss": loss_G, 'target': target_img[0].cpu(), 'source': source_img[0].cpu(),  "output": output[0].cpu(), }
 
-    def validation_end(self, outputs):
+        return {"loss": loss_G, "target": target_img[0].cpu(), 
+            "source": source_img[0].cpu(),  "output": output[0].cpu() 
+            }
+
+    def validation_epoch_end(self, outputs):
+        """The number of validation_step call depends on the batch_size in train.yaml, and thus
+        the method is necessary to accumulate the results.
+        
+        Args:
+            outputs (TYPE): Description
+        
+        Returns:
+            TYPE: Description
+        """
         loss = torch.stack([x["loss"] for x in outputs]).mean()
-        validation_image = []
+        val_img = []
         for x in outputs:
-            validation_image = validation_image + [x['target'], x['source'], x["output"]]
-        validation_image = torchvision.utils.make_grid(validation_image, nrow=3)
+            val_img = val_img + [x['target'], x['source'], x["output"]]
+        val_img = torchvision.utils.make_grid(val_img, nrow=3)
 
-        self.logger.experiment.add_scalar("Validation Loss", loss.item(), self.global_step)
-        self.logger.experiment.add_image("Validation Image", validation_image, self.global_step)
+        self.log("val_loss", loss.item(), prog_bar=True)
+        self.logger.experiment.add_image("val_img", val_img, self.global_step)
 
-        return {"loss": loss, "image": validation_image, }
-
+        return {"loss": loss, "image": val_img}
 
     def configure_optimizers(self):
         lr_g = self.hp.model.learning_rate_E_G
@@ -125,8 +137,8 @@ class AEINet(pl.LightningModule):
             transforms.CenterCrop((256, 256)),
             transforms.ToTensor(),
             ])
-        dataset = AEI_Dataset(self.hp.data.dataset_dir, transform=transform)
-        return DataLoader(dataset, batch_size=self.hp.model.batch_size, num_workers=self.hp.model.num_workers, shuffle=True, drop_last=True)
+        dataset = AEI_Dataset(self.hp.data.trainset_dir, transform=transform)
+        return DataLoader(dataset, batch_size=self.hp.trainer.batch_size, num_workers=self.hp.trainer.num_workers, shuffle=True, drop_last=True)
 
     def val_dataloader(self):
         transform = transforms.Compose([

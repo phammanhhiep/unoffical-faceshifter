@@ -33,11 +33,6 @@ class AEI_Dataset(Dataset):
         else:
             f_idx = random.randrange(l)
 
-        # if f_idx == 0:
-        #     f_idx = s_idx
-        # else:
-        #     f_idx = random.randrange(l)
-
         if f_idx == s_idx:
             same = torch.ones(1)
         else:
