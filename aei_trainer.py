@@ -55,6 +55,7 @@ def main(args):
         "limit_val_batches": hp.trainer.limit_val_batches,
         "limit_train_batches": hp.trainer.limit_train_batches, 
         "log_every_n_steps": hp.log.log_every_n_steps,
+        "flush_logs_every_n_steps": hp.log.flush_logs_every_n_steps,
         "fast_dev_run": args.fast_dev_run,
         "resume_from_checkpoint": args.checkpoint,
     }
