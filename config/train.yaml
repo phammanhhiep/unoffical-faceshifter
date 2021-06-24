@@ -2,7 +2,8 @@ log:
   root_dir: "artifacts/log"
   version: null
   to_file: false
-  log_every_n_steps: 10 # potentially slow the training if using a small value
+  log_every_n_steps: 5 # expensive computation
+  flush_logs_every_n_steps: 10 # expensive computation
 
 chkpt:
   root_dir: "artifacts/checkpoints"
@@ -21,19 +22,19 @@ data:
   valset_dir: "artifacts/datasets/ffhq/val"
 
 trainer:
-  batch_size: 32
+  batch_size: 32 # 32 should work
   num_workers: 2
   max_epoch: 1000
   num_processes: 1 # for distributed computation
   
   val_check_interval: 100
 
-  limit_train_batches: 0.1 # restrict a mount of data for training
-  limit_val_batches: 0.1 # restrict a mount of data for validation
+  limit_train_batches: 1000 # restrict a mount of data for training
+  limit_val_batches: 100 # equal to the number of data points
 
 model:
   name: "faceshifter"
-  experiment: "test_pytorch_lightning" # to create log and checkpoint dir
+  experiment: "other_research_code" # to create log and checkpoint dir
 
   learning_rate_E_G: 4e-4
   learning_rate_D: 4e-4
