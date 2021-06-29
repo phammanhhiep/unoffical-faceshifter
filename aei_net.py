@@ -114,6 +114,7 @@ class AEINet(pl.LightningModule):
         val_img = []
         for x in outputs:
             val_img = val_img + [x['target'], x['source'], x["output"]]
+ 
         val_img = torchvision.utils.make_grid(val_img, nrow=3)
 
         self.log("val_loss", loss.item(), prog_bar=True)

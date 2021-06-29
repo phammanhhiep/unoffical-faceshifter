@@ -25,13 +25,24 @@ class AEI_Dataset(Dataset):
 
 
     def __getitem__(self, index):
+        """The method does not allow to reproducibility because the f_idx, for
+        most of the time, is randomly choosen. Also, it restricts the total
+        training datapoints (pair of source and target images) to 5 times the 
+        number of images (of len(self.files)). 
+        
+        Args:
+            index (TYPE): Description
+        
+        Returns:
+            TYPE: Description
+        """
         l = len(self.files)
         s_idx = index%l
-        if index >= 4*l:
-            f_idx = s_idx
 
+        if index >= 4*l: # 1/5 chance to happen (see the method __len__) 
+            f_idx = s_idx
         else:
-            f_idx = random.randrange(l)
+            f_idx = random.randrange(l) # return any interger in [0, l]
 
         if f_idx == s_idx:
             same = torch.ones(1)
