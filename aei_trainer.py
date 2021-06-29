@@ -58,6 +58,7 @@ def main(args):
         "limit_train_batches": hp.trainer.limit_train_batches, 
         "log_every_n_steps": hp.log.log_every_n_steps,
         "flush_logs_every_n_steps": hp.log.flush_logs_every_n_steps,
+        "accumulate_grad_batches": hp.trainer.accumulate_grad_batches,
         "fast_dev_run": args.fast_dev_run,
         "resume_from_checkpoint": args.checkpoint,
     }
