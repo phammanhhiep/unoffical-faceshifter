@@ -22,15 +22,21 @@ data:
   valset_dir: "artifacts/datasets/ffhq/val"
 
 trainer:
-  batch_size: 32 # 32 should work
-  num_workers: 2
+  batch_size: 2 # 32 should work
+
+  num_workers: 0
   max_epoch: 1000
   num_processes: 1 # for distributed computation
   
-  val_check_interval: 100
+  val_check_interval: 1.0
 
-  limit_train_batches: 1000 # restrict a mount of data for training
-  limit_val_batches: 100 # equal to the number of data points
+  limit_train_batches: 1.0 # TODO: review the option
+  limit_val_batches: 1.0 # TODO: review the option
+
+  gpus: 0
+  num_sanity_val_steps: 0
+
+  accumulate_grad_batches: 8
 
 model:
   name: "faceshifter"
@@ -43,5 +49,3 @@ model:
   beta2: 0.999
 
   grad_clip: 0.0
-
-  
