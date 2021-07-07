@@ -47,7 +47,6 @@ def main(args):
         "logger": pl_logger,
         "callbacks": [checkpoint_callback],
         "num_processes": hp.trainer.num_processes,
-        "accelerator": None if hp.trainer.gpus is None else "dp",
         "gpus": hp.trainer.gpus,
         "num_sanity_val_steps": hp.trainer.num_sanity_val_steps,
         "gradient_clip_val": hp.model.grad_clip,
