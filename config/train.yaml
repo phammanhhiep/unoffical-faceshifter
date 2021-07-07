@@ -36,9 +36,9 @@ trainer:
   gpus: -1
   num_sanity_val_steps: 1
 
-  accumulate_grad_batches: 16 # global step depends on the value
+  accumulate_grad_batches: 32 # global step depends on the value
 
-  d_per_g_train_ratio: 32 #  depends on accumulate_grad_batches and batch_size
+  d_per_g_train_ratio: 2 # depends on accumulate_grad_batches and batch_size
 
 model:
   name: "faceshifter"
