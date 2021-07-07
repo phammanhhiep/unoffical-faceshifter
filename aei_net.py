@@ -51,7 +51,7 @@ class AEINet(pl.LightningModule):
     def training_step(self, batch, batch_idx, optimizer_idx):
         target_img, source_img, same = batch
 
-        if optimizer_idx == 0:
+        if optimizer_idx == 0 and batch_idx % self.hp.trainer.d_per_g_train_ratio:
             output, z_id, output_z_id, feature_map, output_feature_map = self(target_img, source_img)
 
             self.generated_img = output
