@@ -10,7 +10,7 @@ chkpt:
   monitor: "val_loss" # metric to determine if to save
   save_top_k: 1 # only top k models to be save
   every_n_val_epochs: null # save after n (training) epochs. It works if save_top_k > 0
-  every_n_train_steps: null # mutually exclusive to every_n_val_epochs
+  every_n_train_steps: 4 # mutually exclusive to every_n_val_epochs and based on global step
   save_last: true # only work after the first validation step
 
 arcface:
@@ -22,21 +22,21 @@ data:
   valset_dir: "artifacts/datasets/ffhq/val"
 
 trainer:
-  batch_size: 2 # 32 should work
+  batch_size: 2
 
   num_workers: 0
-  max_epoch: 1000
+  max_epoch: 100
   num_processes: 1 # for distributed computation
   
-  val_check_interval: 1.0
+  val_check_interval: 1 # control when to valuate model
 
   limit_train_batches: 1.0 # TODO: review the option
-  limit_val_batches: 1.0 # TODO: review the option
+  limit_val_batches: 10 # TODO: review the option
 
-  gpus: 0
-  num_sanity_val_steps: 0
+  gpus: -1
+  num_sanity_val_steps: 1
 
-  accumulate_grad_batches: 8
+  accumulate_grad_batches: 2 # global step depends on the value
 
 model:
   name: "faceshifter"
