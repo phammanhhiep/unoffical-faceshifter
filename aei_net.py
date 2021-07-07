@@ -97,8 +97,7 @@ class AEINet(pl.LightningModule):
         loss_G = loss_E_G + loss_GAN
 
         return {"loss": loss_G, "target": target_img[0].cpu(), 
-            "source": source_img[0].cpu(),  "output": output[0].cpu() 
-            }
+            "source": source_img[0].cpu(),  "output": output[0].cpu()}
 
     def validation_epoch_end(self, outputs):
         """The number of validation_step call depends on the batch_size in train.yaml, and thus
