@@ -51,25 +51,26 @@ class AEINet(pl.LightningModule):
     def training_step(self, batch, batch_idx, optimizer_idx):
         target_img, source_img, same = batch
 
-        if optimizer_idx == 0 and batch_idx % self.hp.trainer.d_per_g_train_ratio:
+        if optimizer_idx == 0:
             output, z_id, output_z_id, feature_map, output_feature_map = self(target_img, source_img)
 
             self.generated_img = output
 
-            output_multi_scale_val = self.D(output)
-            loss_GAN = self.Loss_GAN(output_multi_scale_val, True, for_discriminator=False)
-            loss_E_G, loss_attr, loss_id, loss_rec = self.Loss_E_G(target_img, 
-                output, feature_map, output_feature_map, z_id, output_z_id, same)
+            if batch_idx % self.hp.trainer.d_per_g_train_ratio:
+                output_multi_scale_val = self.D(output)
+                loss_GAN = self.Loss_GAN(output_multi_scale_val, True, for_discriminator=False)
+                loss_E_G, loss_attr, loss_id, loss_rec = self.Loss_E_G(target_img, 
+                    output, feature_map, output_feature_map, z_id, output_z_id, same)
 
-            loss_G = loss_E_G + loss_GAN
+                loss_G = loss_E_G + loss_GAN
 
-            self.log("gan_loss", loss_GAN.item(),prog_bar=True)
-            self.log("g_loss", loss_G.item(),prog_bar=True)
-            self.log("attr_loss", loss_attr.item(),prog_bar=True)
-            self.log("id_loss", loss_id.item(), prog_bar=True)
-            self.log("rec_loss", loss_rec.item(),prog_bar=True)
+                self.log("gan_loss", loss_GAN.item(),prog_bar=True)
+                self.log("g_loss", loss_G.item(),prog_bar=True)
+                self.log("attr_loss", loss_attr.item(),prog_bar=True)
+                self.log("id_loss", loss_id.item(), prog_bar=True)
+                self.log("rec_loss", loss_rec.item(),prog_bar=True)
 
-            return loss_G
+                return loss_G
 
         else:
             multi_scale_val = self.D(target_img)
