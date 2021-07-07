@@ -2,15 +2,15 @@ log:
   root_dir: "artifacts/log"
   version: null
   to_file: false
-  log_every_n_steps: 5 # expensive computation
-  flush_logs_every_n_steps: 10 # expensive computation
+  log_every_n_steps: 16 # expensive computation
+  flush_logs_every_n_steps: 16 # expensive computation
 
 chkpt:
   root_dir: "artifacts/checkpoints"
   monitor: "val_loss" # metric to determine if to save
   save_top_k: 1 # only top k models to be save
   every_n_val_epochs: null # save after n (training) epochs. It works if save_top_k > 0
-  every_n_train_steps: 4 # mutually exclusive to every_n_val_epochs and based on global step
+  every_n_train_steps: null # mutually exclusive to every_n_val_epochs and based on global step
   save_last: true # only work after the first validation step
 
 arcface:
@@ -28,15 +28,17 @@ trainer:
   max_epoch: 100
   num_processes: 1 # for distributed computation
   
-  val_check_interval: 1 # control when to valuate model
+  val_check_interval: 800 # control when to valuate model
 
   limit_train_batches: 1.0 # TODO: review the option
-  limit_val_batches: 10 # TODO: review the option
+  limit_val_batches: 100 # TODO: review the option
 
   gpus: -1
   num_sanity_val_steps: 1
 
-  accumulate_grad_batches: 2 # global step depends on the value
+  accumulate_grad_batches: 16 # global step depends on the value
+
+  d_per_g_train_ratio: 32 #  depends on accumulate_grad_batches and batch_size
 
 model:
   name: "faceshifter"
