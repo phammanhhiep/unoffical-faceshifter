@@ -51,7 +51,7 @@ def main(args):
         "num_sanity_val_steps": hp.trainer.num_sanity_val_steps,
         "gradient_clip_val": hp.model.grad_clip,
         "val_check_interval": hp.trainer.val_check_interval,
-        "progress_bar_refresh_rate": 1,
+        "progress_bar_refresh_rate": hp.log.progress_bar_refresh_rate,
         "max_epochs": hp.trainer.max_epoch, 
         "limit_val_batches": hp.trainer.limit_val_batches,
         "limit_train_batches": hp.trainer.limit_train_batches, 
